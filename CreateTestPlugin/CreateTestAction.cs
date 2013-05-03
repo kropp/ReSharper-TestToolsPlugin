@@ -103,12 +103,20 @@ namespace CreateTestPlugin
       }
 
       // Act
-      var invocation = originalMethod.ReturnType.IsVoid()
+      var invocation = !originalMethod.ReturnType.IsVoid()
         ? factory.CreateStatement("$0 result = " + originalMethod.ShortName + "();", originalMethod.ReturnType)
         : factory.CreateStatement(originalMethod.ShortName + "();");
       anchorStatement = testMethod.Body.AddStatementAfter(invocation, anchorStatement);
 
       // Assert
+      if (!originalMethod.ReturnType.IsVoid())
+      {
+        var stmt = factory.CreateStatement("$0 expected = $1;", originalMethod.ReturnType, DefaultValueUtil.GetDefaultValue(originalMethod.ReturnType, testMethod.Language, psiModule));
+        anchorStatement = testMethod.Body.AddStatementAfter(stmt, anchorStatement);
+
+        stmt = factory.CreateStatement("Assert.AreEqual(expected, result);");
+        anchorStatement = testMethod.Body.AddStatementAfter(stmt, anchorStatement);
+      }
     }
 
     public override string Text
