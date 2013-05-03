@@ -60,6 +60,29 @@ namespace CreateTestPlugin
 
       var nunitTestType = TypeFactory.CreateTypeByCLRName("NUnit.Framework.TestAttribute", myProvider.PsiModule, myClassDeclaration.GetProject().GetResolveContext()).GetTypeElement();
 
+      if (myClassDeclaration.MethodDeclarations.Any(m => !m.IsStatic))
+      {
+        var fieldName = "my" + myClassDeclaration.DeclaredName + "Instance";
+
+        var setUpMethod = factory.CreateTypeMemberDeclaration("public void SetUp(){}") as IMethodDeclaration;
+        if (setUpMethod != null)
+        {
+          var nunitSetUpType = TypeFactory.CreateTypeByCLRName("NUnit.Framework.SetUpAttribute", myProvider.PsiModule, myClassDeclaration.GetProject().GetResolveContext());
+          attribute = factory.CreateAttribute(nunitSetUpType.GetTypeElement());
+          setUpMethod.AddAttributeBefore(attribute, null);
+
+          setUpMethod.Body.AddStatementAfter(factory.CreateStatement(fieldName + " = new $0();", myClassDeclaration.DeclaredElement), null);
+
+          testClass.AddClassMemberDeclarationBefore(setUpMethod, null);
+        }
+
+        var field = factory.CreateTypeMemberDeclaration("private $0 " + fieldName + ";", myClassDeclaration.DeclaredElement) as IFieldDeclaration;
+        if (field != null)
+        {
+          testClass.AddClassMemberDeclarationBefore(field, null);
+        }
+      }
+
       // create test method for each method defined in original class
       foreach (var methodDeclaration in myClassDeclaration.MethodDeclarations)
       {
@@ -108,21 +131,24 @@ namespace CreateTestPlugin
         anchorStatement = testMethod.Body.AddStatementAfter(stmt, anchorStatement);
       }
 
+      // Assert
+      if (!originalMethod.ReturnType.IsVoid())
+      {
+        var stmt = factory.CreateStatement("$0 expected = $1;", originalMethod.ReturnType,
+          DefaultValueUtil.GetDefaultValue(originalMethod.ReturnType, testMethod.Language, psiModule));
+        anchorStatement = testMethod.Body.AddStatementAfter(stmt, anchorStatement);
+      }
+
       // Act
-      var methodInvocation = (originalMethod.IsStatic ? "$1" : "my"+originalMethod.GetContainingType().ShortName+"Instance") + "." + originalMethod.ShortName;
+      var methodInvocation = (originalMethod.IsStatic ? "$1" : "my" + originalMethod.GetContainingType().ShortName + "Instance") + "." + originalMethod.ShortName;
       var invocationStatement = !originalMethod.ReturnType.IsVoid()
         ? factory.CreateStatement("$0 result = " + methodInvocation + "(" + paramsList + ");", originalMethod.ReturnType, originalMethod.GetContainingType())
         : factory.CreateStatement(methodInvocation + "(" + paramsList + ");", null, originalMethod.GetContainingType());
 
       anchorStatement = testMethod.Body.AddStatementAfter(invocationStatement, anchorStatement);
-
-      // Assert
       if (!originalMethod.ReturnType.IsVoid())
       {
-        var stmt = factory.CreateStatement("$0 expected = $1;", originalMethod.ReturnType, DefaultValueUtil.GetDefaultValue(originalMethod.ReturnType, testMethod.Language, psiModule));
-        anchorStatement = testMethod.Body.AddStatementAfter(stmt, anchorStatement);
-
-        stmt = factory.CreateStatement("Assert.AreEqual(expected, result);");
+        var stmt = factory.CreateStatement("Assert.AreEqual(expected, result);");
         testMethod.Body.AddStatementAfter(stmt, anchorStatement);
       }
     }
