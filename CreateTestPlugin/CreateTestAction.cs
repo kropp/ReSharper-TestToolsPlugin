@@ -9,6 +9,7 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.Psi.CSharp.Tree;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
+using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Services;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.TextControl;
@@ -65,7 +66,11 @@ namespace CreateTestPlugin
         if (testMethod == null)
           continue;
 
-        GenerateTestMethodBody(factory, testMethod, methodDeclaration);
+        var declaredMethod = methodDeclaration.DeclaredElement;
+        if (declaredMethod == null)
+          continue;
+
+        GenerateTestMethodBody(factory, methodDeclaration.GetPsiModule(), testMethod, declaredMethod);
 
         testMethod.AddAttributeBefore(factory.CreateAttribute(nunitTestType), null);
         testClass.AddClassMemberDeclaration(testMethod);
@@ -84,19 +89,24 @@ namespace CreateTestPlugin
     /// <param name="factory"></param>
     /// <param name="testMethod"></param>
     /// <param name="originalMethod"></param>
-    private void GenerateTestMethodBody(CSharpElementFactory factory, IMethodDeclaration testMethod, IMethodDeclaration originalMethod)
+    /// <param name="psiModule"></param>
+    private void GenerateTestMethodBody(CSharpElementFactory factory, IPsiModule psiModule, IMethodDeclaration testMethod, IMethod originalMethod)
     {
       ICSharpStatement anchorStatement = null;
       
       // Arrange
-      foreach (var parameterDeclaration in originalMethod.ParameterDeclarations)
+      foreach (var parameterDeclaration in originalMethod.Parameters)
       {
         var type = parameterDeclaration.Type;
-        var stmt = factory.CreateStatement("$0 " + parameterDeclaration.DeclaredName + " = $1;", type, DefaultValueUtil.GetDefaultValue(type, originalMethod.Language, originalMethod.GetPsiModule()));
+        var stmt = factory.CreateStatement("$0 " + parameterDeclaration.ShortName + " = $1;", type, DefaultValueUtil.GetDefaultValue(type, testMethod.Language, psiModule));
         anchorStatement = testMethod.Body.AddStatementAfter(stmt, anchorStatement);
       }
 
       // Act
+      var invocation = originalMethod.ReturnType.IsVoid()
+        ? factory.CreateStatement("$0 result = " + originalMethod.ShortName + "();", originalMethod.ReturnType)
+        : factory.CreateStatement(originalMethod.ShortName + "();");
+      anchorStatement = testMethod.Body.AddStatementAfter(invocation, anchorStatement);
 
       // Assert
     }
