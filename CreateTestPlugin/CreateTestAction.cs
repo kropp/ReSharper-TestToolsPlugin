@@ -9,6 +9,7 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.Psi.CSharp.Tree;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
+using JetBrains.ReSharper.Psi.Impl.Search;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.TextControl;
 using JetBrains.Util;
@@ -40,13 +41,28 @@ namespace CreateTestPlugin
     {
       var factory = CSharpElementFactory.GetInstance(myProvider.PsiModule);
 
-      var file = factory.CreateFile("public class "+ myClassDeclaration.DeclaredName +"Test {}");
-      var testClass = file.TypeDeclarations.First();
+      var testClassName = myClassDeclaration.DeclaredName + "Test";
+      
+      var file = factory.CreateFile("public class " + testClassName + " {}");
+      var testClass = file.TypeDeclarations.First() as IClassDeclaration;
+
+      if (testClass == null)
+        return null;
 
       var nunitFixtureType = TypeFactory.CreateTypeByCLRName("NUnit.Framework.TestFixtureAttribute", myProvider.PsiModule, myClassDeclaration.GetProject().GetResolveContext());
-      var typeElement = nunitFixtureType.GetTypeElement();
-      var attribute = factory.CreateAttribute(typeElement);
+      var attribute = factory.CreateAttribute(nunitFixtureType.GetTypeElement());
       testClass.AddAttributeBefore(attribute, null);
+
+      var nunitTestType = TypeFactory.CreateTypeByCLRName("NUnit.Framework.TestAttribute", myProvider.PsiModule, myClassDeclaration.GetProject().GetResolveContext()).GetTypeElement();
+      foreach (var methodDeclaration in myClassDeclaration.MethodDeclarations)
+      {
+        var testMethod = factory.CreateTypeMemberDeclaration("public void Test" + methodDeclaration.DeclaredName + "(){}") as IClassMemberDeclaration;
+        if (testMethod == null)
+          continue;
+
+        testMethod.AddAttributeBefore(factory.CreateAttribute(nunitTestType), null);
+        testClass.AddClassMemberDeclaration(testMethod);
+      }
 
       using (WriteLockCookie.Create())
         ModificationUtil.AddChildAfter(myClassDeclaration, testClass);
