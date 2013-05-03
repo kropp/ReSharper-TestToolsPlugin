@@ -9,6 +9,7 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.Psi.CSharp.Tree;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
+using JetBrains.ReSharper.Psi.Services;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.TextControl;
 using JetBrains.Util;
@@ -60,9 +61,11 @@ namespace CreateTestPlugin
       // create test method for each method defined in original class
       foreach (var methodDeclaration in myClassDeclaration.MethodDeclarations)
       {
-        var testMethod = factory.CreateTypeMemberDeclaration("public void Test" + methodDeclaration.DeclaredName + "(){}") as IClassMemberDeclaration;
+        var testMethod = factory.CreateTypeMemberDeclaration("public void Test" + methodDeclaration.DeclaredName + "(){}") as IMethodDeclaration;
         if (testMethod == null)
           continue;
+
+        GenerateTestMethodBody(factory, testMethod, methodDeclaration);
 
         testMethod.AddAttributeBefore(factory.CreateAttribute(nunitTestType), null);
         testClass.AddClassMemberDeclaration(testMethod);
@@ -73,6 +76,29 @@ namespace CreateTestPlugin
         ModificationUtil.AddChildAfter(myClassDeclaration, testClass);
 
       return null;
+    }
+
+    /// <summary>
+    /// Generates Arrange/Act/Assert stub for test method based on original method declaration
+    /// </summary>
+    /// <param name="factory"></param>
+    /// <param name="testMethod"></param>
+    /// <param name="originalMethod"></param>
+    private void GenerateTestMethodBody(CSharpElementFactory factory, IMethodDeclaration testMethod, IMethodDeclaration originalMethod)
+    {
+      ICSharpStatement anchorStatement = null;
+      
+      // Arrange
+      foreach (var parameterDeclaration in originalMethod.ParameterDeclarations)
+      {
+        var type = parameterDeclaration.Type;
+        var stmt = factory.CreateStatement("$0 " + parameterDeclaration.DeclaredName + " = $1;", type, DefaultValueUtil.GetDefaultValue(type, originalMethod.Language, originalMethod.GetPsiModule()));
+        anchorStatement = testMethod.Body.AddStatementAfter(stmt, anchorStatement);
+      }
+
+      // Act
+
+      // Assert
     }
 
     public override string Text
