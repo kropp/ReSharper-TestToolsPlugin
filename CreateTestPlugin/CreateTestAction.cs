@@ -1,12 +1,14 @@
 using System;
+using JetBrains.Application;
 using JetBrains.Application.Progress;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.Bulbs;
 using JetBrains.ReSharper.Feature.Services.CSharp.Bulbs;
-using JetBrains.ReSharper.Feature.Services.LinqTools;
 using JetBrains.ReSharper.Intentions.Extensibility;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.Psi.CSharp.Tree;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.TextControl;
 using JetBrains.Util;
@@ -21,6 +23,7 @@ namespace CreateTestPlugin
   public class CreateTestAction : ContextActionBase
   {
     private readonly ICSharpContextActionDataProvider myProvider;
+    private IClassDeclaration myClassDeclaration;
 
     public CreateTestAction(ICSharpContextActionDataProvider provider)
     {
@@ -29,34 +32,25 @@ namespace CreateTestPlugin
 
     public override bool IsAvailable(IUserDataHolder cache)
     {
-/*
-      var literal = myProvider.GetSelectedElement<ILiteralExpression>(true, true);
-      if (literal != null && literal.IsConstantValue() && literal.ConstantValue.IsString())
-      {
-        var s = literal.ConstantValue.Value as string;
-        if (!string.IsNullOrEmpty(s))
-        {
-          return true;
-        }
-      }
-*/
-      return false;
+      myClassDeclaration = myProvider.GetSelectedElement<IClassDeclaration>(true, true);
+      return myClassDeclaration != null;
     }
 
     protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress)
     {
-/*
-      CSharpElementFactory factory = CSharpElementFactory.GetInstance(myProvider.PsiModule);
+      var factory = CSharpElementFactory.GetInstance(myProvider.PsiModule);
 
-      var stringValue = _stringLiteral.ConstantValue.Value as string;
-      if (stringValue == null)
-        return null;
+      var file = factory.CreateFile("public class "+ myClassDeclaration.DeclaredName +"Test {}");
+      var testClass = file.TypeDeclarations.First();
 
-      var chars = stringValue.ToCharArray();
-      Array.Reverse(chars);
-      ICSharpExpression newExpr = factory.CreateExpressionAsIs("\"" + new string(chars) + "\"");
-      _stringLiteral.ReplaceBy(newExpr);
-*/
+      var nunitFixtureType = TypeFactory.CreateTypeByCLRName("NUnit.Framework.TestFixtureAttribute", myProvider.PsiModule, myClassDeclaration.GetProject().GetResolveContext());
+      var typeElement = nunitFixtureType.GetTypeElement();
+      var attribute = factory.CreateAttribute(typeElement);
+      testClass.AddAttributeBefore(attribute, null);
+
+      using (WriteLockCookie.Create())
+        ModificationUtil.AddChildAfter(myClassDeclaration, testClass);
+
       return null;
     }
 
