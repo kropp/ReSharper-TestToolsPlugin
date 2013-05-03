@@ -9,17 +9,12 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp;
 using JetBrains.ReSharper.Psi.CSharp.Tree;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
-using JetBrains.ReSharper.Psi.Impl.Search;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.TextControl;
 using JetBrains.Util;
 
 namespace CreateTestPlugin
 {
-  /// <summary>
-  /// This is an example context action. The test project demonstrates tests for
-  /// availability and execution of this action.
-  /// </summary>
   [ContextAction(Name = "CreateTest", Description = "Creates a test", Group = "C#")]
   public class CreateTestAction : ContextActionBase
   {
@@ -34,12 +29,16 @@ namespace CreateTestPlugin
     public override bool IsAvailable(IUserDataHolder cache)
     {
       myClassDeclaration = myProvider.GetSelectedElement<IClassDeclaration>(true, true);
+      // this context action is available on every class at the moment
+      // TODO: add some constraints, like: there is already a test for this class
       return myClassDeclaration != null;
     }
 
     protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress)
     {
       var factory = CSharpElementFactory.GetInstance(myProvider.PsiModule);
+
+      // create a test fixture class with name of original class plus Test
 
       var testClassName = myClassDeclaration.DeclaredName + "Test";
       
@@ -49,11 +48,16 @@ namespace CreateTestPlugin
       if (testClass == null)
         return null;
 
+      // resolve TestFixture attribute from NUnit (assembly/NuGet reference should be added beforehand)
+      // this way all necessary usings will be added automatically
+
       var nunitFixtureType = TypeFactory.CreateTypeByCLRName("NUnit.Framework.TestFixtureAttribute", myProvider.PsiModule, myClassDeclaration.GetProject().GetResolveContext());
       var attribute = factory.CreateAttribute(nunitFixtureType.GetTypeElement());
       testClass.AddAttributeBefore(attribute, null);
 
       var nunitTestType = TypeFactory.CreateTypeByCLRName("NUnit.Framework.TestAttribute", myProvider.PsiModule, myClassDeclaration.GetProject().GetResolveContext()).GetTypeElement();
+
+      // create test method for each method defined in original class
       foreach (var methodDeclaration in myClassDeclaration.MethodDeclarations)
       {
         var testMethod = factory.CreateTypeMemberDeclaration("public void Test" + methodDeclaration.DeclaredName + "(){}") as IClassMemberDeclaration;
@@ -64,6 +68,7 @@ namespace CreateTestPlugin
         testClass.AddClassMemberDeclaration(testMethod);
       }
 
+      // finally add newly created test class to file
       using (WriteLockCookie.Create())
         ModificationUtil.AddChildAfter(myClassDeclaration, testClass);
 
