@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using JetBrains.Application;
 using JetBrains.Application.Progress;
 using JetBrains.ProjectModel;
@@ -93,20 +94,27 @@ namespace CreateTestPlugin
     private void GenerateTestMethodBody(CSharpElementFactory factory, IPsiModule psiModule, IMethodDeclaration testMethod, IMethod originalMethod)
     {
       ICSharpStatement anchorStatement = null;
-      
+
+      var paramsList = new StringBuilder();
       // Arrange
       foreach (var parameterDeclaration in originalMethod.Parameters)
       {
+        if (paramsList.Length > 0)
+          paramsList.Append(", ");
+        paramsList.Append(parameterDeclaration.ShortName);
+
         var type = parameterDeclaration.Type;
         var stmt = factory.CreateStatement("$0 " + parameterDeclaration.ShortName + " = $1;", type, DefaultValueUtil.GetDefaultValue(type, testMethod.Language, psiModule));
         anchorStatement = testMethod.Body.AddStatementAfter(stmt, anchorStatement);
       }
 
       // Act
-      var invocation = !originalMethod.ReturnType.IsVoid()
-        ? factory.CreateStatement("$0 result = " + originalMethod.ShortName + "();", originalMethod.ReturnType)
-        : factory.CreateStatement(originalMethod.ShortName + "();");
-      anchorStatement = testMethod.Body.AddStatementAfter(invocation, anchorStatement);
+      var methodInvocation = (originalMethod.IsStatic ? "$1" : "my"+originalMethod.GetContainingType().ShortName+"Instance") + "." + originalMethod.ShortName;
+      var invocationStatement = !originalMethod.ReturnType.IsVoid()
+        ? factory.CreateStatement("$0 result = " + methodInvocation + "(" + paramsList + ");", originalMethod.ReturnType, originalMethod.GetContainingType())
+        : factory.CreateStatement(methodInvocation + "(" + paramsList + ");", null, originalMethod.GetContainingType());
+
+      anchorStatement = testMethod.Body.AddStatementAfter(invocationStatement, anchorStatement);
 
       // Assert
       if (!originalMethod.ReturnType.IsVoid())
@@ -115,7 +123,7 @@ namespace CreateTestPlugin
         anchorStatement = testMethod.Body.AddStatementAfter(stmt, anchorStatement);
 
         stmt = factory.CreateStatement("Assert.AreEqual(expected, result);");
-        anchorStatement = testMethod.Body.AddStatementAfter(stmt, anchorStatement);
+        testMethod.Body.AddStatementAfter(stmt, anchorStatement);
       }
     }
 
