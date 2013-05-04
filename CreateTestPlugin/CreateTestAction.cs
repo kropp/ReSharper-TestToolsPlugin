@@ -119,38 +119,57 @@ namespace CreateTestPlugin
       ICSharpStatement anchorStatement = null;
 
       var paramsList = new StringBuilder();
+
       // Arrange
       foreach (var parameterDeclaration in originalMethod.Parameters)
       {
-        if (paramsList.Length > 0)
-          paramsList.Append(", ");
-        paramsList.Append(parameterDeclaration.ShortName);
-
         var type = parameterDeclaration.Type;
         var stmt = factory.CreateStatement("$0 " + parameterDeclaration.ShortName + " = $1;", type, DefaultValueUtil.GetDefaultValue(type, testMethod.Language, psiModule));
         anchorStatement = testMethod.Body.AddStatementAfter(stmt, anchorStatement);
+
+        if (paramsList.Length == 0) // First parameter
+          ModificationUtil.AddChildBefore(anchorStatement, factory.CreateComment("// Arrange" + Environment.NewLine));
+        else
+          paramsList.Append(", ");
+        paramsList.Append(parameterDeclaration.ShortName);
       }
 
-      // Assert
       if (!originalMethod.ReturnType.IsVoid())
       {
         var stmt = factory.CreateStatement("$0 expected = $1;", originalMethod.ReturnType,
           DefaultValueUtil.GetDefaultValue(originalMethod.ReturnType, testMethod.Language, psiModule));
         anchorStatement = testMethod.Body.AddStatementAfter(stmt, anchorStatement);
+
+        if (originalMethod.Parameters.IsEmpty())
+          ModificationUtil.AddChildBefore(anchorStatement, factory.CreateComment("// Arrange"));
       }
 
+      
       // Act
       var methodInvocation = (originalMethod.IsStatic ? "$1" : "my" + originalMethod.GetContainingType().ShortName + "Instance") + "." + originalMethod.ShortName;
       var invocationStatement = !originalMethod.ReturnType.IsVoid()
         ? factory.CreateStatement("$0 result = " + methodInvocation + "(" + paramsList + ");", originalMethod.ReturnType, originalMethod.GetContainingType())
         : factory.CreateStatement(methodInvocation + "(" + paramsList + ");", null, originalMethod.GetContainingType());
-
       anchorStatement = testMethod.Body.AddStatementAfter(invocationStatement, anchorStatement);
+
+      AddCommentWithNewLineBefore(factory, anchorStatement, "// Act");
+
+
+      // Assert
       if (!originalMethod.ReturnType.IsVoid())
       {
         var stmt = factory.CreateStatement("Assert.AreEqual(expected, result);");
-        testMethod.Body.AddStatementAfter(stmt, anchorStatement);
+        anchorStatement = testMethod.Body.AddStatementAfter(stmt, anchorStatement);
+
+        AddCommentWithNewLineBefore(factory, anchorStatement, "// Assert");
       }
+    }
+
+    private static void AddCommentWithNewLineBefore(CSharpElementFactory factory, ITreeNode anchorStatement, string text)
+    {
+      foreach (var whitespaceNode in factory.CreateWhitespaces(Environment.NewLine))
+        ModificationUtil.AddChildBefore(anchorStatement, whitespaceNode);
+      ModificationUtil.AddChildBefore(anchorStatement, factory.CreateComment(text));
     }
 
     public override string Text
