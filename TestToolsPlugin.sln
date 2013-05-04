@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreateTestPlugin", "CreateTestPlugin.csproj", "{E9EADE7D-287C-4BE9-9941-27076654E14B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestToolsPlugin", "TestToolsPlugin\TestToolsPlugin.csproj", "{E9EADE7D-287C-4BE9-9941-27076654E14B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
