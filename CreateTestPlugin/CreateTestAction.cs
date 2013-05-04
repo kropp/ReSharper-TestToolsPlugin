@@ -102,9 +102,9 @@ namespace CreateTestPlugin
 
       // finally add newly created test class to file
       using (WriteLockCookie.Create())
-        ModificationUtil.AddChildAfter(myClassDeclaration, testClass);
+        testClass = ModificationUtil.AddChildAfter(myClassDeclaration, testClass);
 
-      return null;
+      return control => control.Caret.MoveTo(control.Document.GetCoordsByOffset(testClass.NameIdentifier.GetDocumentStartOffset().TextRange.StartOffset), CaretVisualPlacement.DontScrollIfVisible);
     }
 
     /// <summary>
