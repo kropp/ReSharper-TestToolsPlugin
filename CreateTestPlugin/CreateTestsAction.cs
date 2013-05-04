@@ -18,13 +18,13 @@ using JetBrains.Util;
 
 namespace CreateTestPlugin
 {
-  [ContextAction(Name = "CreateTest", Description = "Creates a test", Group = "C#")]
-  public class CreateTestAction : ContextActionBase
+  [ContextAction(Name = "CreateTests", Description = "Creates tests for given class", Group = "C#")]
+  public class CreateTestsAction : ContextActionBase
   {
     private readonly ICSharpContextActionDataProvider myProvider;
     private IClassDeclaration myClassDeclaration;
 
-    public CreateTestAction(ICSharpContextActionDataProvider provider)
+    public CreateTestsAction(ICSharpContextActionDataProvider provider)
     {
       myProvider = provider;
     }
@@ -174,7 +174,7 @@ namespace CreateTestPlugin
 
     public override string Text
     {
-      get { return "Create a test"; }
+      get { return "Create tests"; }
     }
   }
 }
