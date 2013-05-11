@@ -1,20 +1,28 @@
-﻿using System.Windows.Forms;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 using JetBrains.ActionManagement;
-using JetBrains.Application;
 using JetBrains.Application.DataContext;
 using JetBrains.Application.Interop.NativeHook;
-using JetBrains.CommonControls.Validation;
+using JetBrains.DataFlow;
 using JetBrains.IDE.TreeBrowser;
-using JetBrains.Interop.WinApi;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Features.Common.UI;
+using JetBrains.ReSharper.Features.Shared.UnitTesting;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.UnitTestExplorer;
 using JetBrains.ReSharper.UnitTestFramework;
+using JetBrains.ReSharper.UnitTestFramework.Resources;
+using JetBrains.Text;
 using JetBrains.UI.Application;
-using JetBrains.UI.CommonDialogs;
+using JetBrains.UI.GotoByName;
+using JetBrains.UI.PopupMenu;
+using JetBrains.UI.PopupMenu.Impl;
+using JetBrains.UI.PopupWindowManager;
+using JetBrains.UI.RichText;
+using JetBrains.UI.Tooltips;
 using JetBrains.Util;
 using DataConstants = JetBrains.ProjectModel.DataContext.DataConstants;
-using MessageBox = JetBrains.Util.MessageBox;
 
 namespace CreateTestPlugin
 {
@@ -37,18 +45,48 @@ namespace CreateTestPlugin
       if (elements == null || elements.ExplicitElements.IsEmpty())
         return;
 
-      var prompt = new PromptWinForm(solution.GetComponent<IWin32Window>(), "Tag test", "Enter category name",
-        string.Empty, s => null, solution.GetComponent<IWindowsHookManager>(), solution.GetComponent<FormValidators>(),
-        solution.GetComponent<IUIApplication>());
-      if (prompt.ShowDialog())
+      // ask user to enter category name, provide nice completition of existing categories
+
+      var categoriesProvider = solution.GetComponent<IUnitTestingCategoriesProvider>();
+
+      var ltd = Lifetimes.Define(solution.GetLifetime());
+
+      var completionPicker = new CompletionPickerPopupDialog(solution.GetComponent<IUIApplication>(), solution.GetComponent<ITooltipManager>(), solution.GetComponent<IMainWindow>(), solution.GetComponent<IWindowsHookManager>(), solution.GetComponent<MainWindowPopupWindowContext>(), solution.GetComponent<PopupWindowManager>(), solution)
       {
+        LabelText = new RichTextBlock("Enter category name"),
+        Text = "Tag tests"
+      };
+      var settings = new CompletionPickerSettings();
+      var completion = new GotoByNameModel(ltd.Lifetime);
+      completion.FilterText.Change.Advise(ltd.Lifetime, args =>
+      {
+        completion.Items.Clear();
+        if (!args.HasNew)
+          return;
+        completion.Items.AddRange(SuggestCategories(categoriesProvider, args.New).Select(str => new JetPopupMenuItem(str, new SimpleMenuItem(str, UnitTestingThemedIcons.Category.Id, null))));
+      });
+      settings.CompletionModel.Value = completion;
+      completionPicker.Settings.Value = settings;
+
+      if (completionPicker.ShowDialog() == DialogResult.OK)
+      {
+        // finally mark explicitly selected tests with chosen category
         var psiServices = solution.GetComponent<IPsiServices>();
         psiServices.Transactions.Execute("Tag test", () =>
         {
           foreach (var element in elements.ExplicitElements)
-            element.MarkWithCategory(prompt.Value);
+            element.MarkWithCategory(completionPicker.TypeChooserText.Value);
         });
       }
+
+      ltd.Terminate();
+    }
+
+    private static IEnumerable<string> SuggestCategories(IUnitTestingCategoriesProvider categoriesProvider, string filter)
+    {
+      // using camel humps matcher that is used everywhere in ReSharper
+      var matcher = new IdentifierMatcher(filter);
+      return categoriesProvider.Categories.Where(matcher.Matches);
     }
   }
 }

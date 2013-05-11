@@ -14,18 +14,22 @@ namespace CreateTestPlugin
     public static void MarkWithCategory(this IUnitTestElement element, string category)
     {
       var attributesOwner = element.GetDeclaredElement() as IAttributesOwner;
-      if (attributesOwner != null)
-      {
-        var declaration = attributesOwner.GetDeclarations().FirstOrDefault() as IAttributesOwnerDeclaration;
-        if (declaration != null)
-        {
-          var resolveContext = declaration.GetProject().GetResolveContext();
-          var psiModule = attributesOwner.Module;
-          var nunitCategoryType = TypeFactory.CreateTypeByCLRName("NUnit.Framework.CategoryAttribute", psiModule, resolveContext).GetTypeElement();
-          var attribute = CSharpElementFactory.GetInstance(declaration).CreateAttribute(nunitCategoryType, new[] {new AttributeValue(new ConstantValue(category, psiModule, resolveContext))}, new Pair<string, AttributeValue>[0]);
-          declaration.AddAttributeBefore(attribute, null);
-        }
-      }
+      if (attributesOwner == null)
+        return;
+      
+      var declaration = attributesOwner.GetDeclarations().FirstOrDefault() as IAttributesOwnerDeclaration;
+      if (declaration == null)
+        return;
+
+      var resolveContext = declaration.GetProject().GetResolveContext();
+      var psiModule = attributesOwner.Module;
+
+      // create attribute instance
+      var nunitCategoryType = TypeFactory.CreateTypeByCLRName("NUnit.Framework.CategoryAttribute", psiModule, resolveContext).GetTypeElement();
+      var attribute = CSharpElementFactory.GetInstance(declaration).CreateAttribute(nunitCategoryType, new[] {new AttributeValue(new ConstantValue(category, psiModule, resolveContext))}, new Pair<string, AttributeValue>[0]);
+
+      // and add it to existing declaration with
+      declaration.AddAttributeBefore(attribute, null);
     }
   }
 }
