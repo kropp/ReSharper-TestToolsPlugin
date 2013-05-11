@@ -5,13 +5,11 @@ using JetBrains.ActionManagement;
 using JetBrains.Application.DataContext;
 using JetBrains.Application.Interop.NativeHook;
 using JetBrains.DataFlow;
-using JetBrains.IDE.TreeBrowser;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Features.Common.UI;
 using JetBrains.ReSharper.Features.Shared.UnitTesting;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.UnitTestExplorer;
-using JetBrains.ReSharper.UnitTestFramework;
 using JetBrains.ReSharper.UnitTestFramework.Resources;
 using JetBrains.Text;
 using JetBrains.UI.Application;
@@ -31,8 +29,9 @@ namespace CreateTestPlugin
   {
     public bool Update(IDataContext context, ActionPresentation presentation, DelegateUpdate nextUpdate)
     {
-      // for performance reasons we don't do lots of checks here, because Update is called very often
-      return context.GetData(TreeModelBrowser.TREE_MODEL_DESCRIPTOR) is IUnitTestSessionView;
+      // action is in context menu, so it is updated only once when menu is shown
+      var elements = context.GetData(UnitTestDataConstants.UNIT_TEST_ELEMENTS);
+      return elements != null && elements.ExplicitElements.Any();
     }
 
     public void Execute(IDataContext context, DelegateExecute nextExecute)
