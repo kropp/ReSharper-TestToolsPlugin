@@ -8,7 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Package.nuspec = Package.nuspec
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MethodRunner", "MethodRunner\MethodRunner.csproj", "{BBECCF5A-32E4-4473-96C1-18B0BB3E0D1A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MethodRunner", "MethodRunner\MethodRunner.csproj", "{A38DB6A1-896E-487D-9C83-D1BFB655CFAB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,10 +20,10 @@ Global
 		{E9EADE7D-287C-4BE9-9941-27076654E14B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9EADE7D-287C-4BE9-9941-27076654E14B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E9EADE7D-287C-4BE9-9941-27076654E14B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BBECCF5A-32E4-4473-96C1-18B0BB3E0D1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BBECCF5A-32E4-4473-96C1-18B0BB3E0D1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BBECCF5A-32E4-4473-96C1-18B0BB3E0D1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BBECCF5A-32E4-4473-96C1-18B0BB3E0D1A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A38DB6A1-896E-487D-9C83-D1BFB655CFAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A38DB6A1-896E-487D-9C83-D1BFB655CFAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A38DB6A1-896E-487D-9C83-D1BFB655CFAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A38DB6A1-896E-487D-9C83-D1BFB655CFAB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

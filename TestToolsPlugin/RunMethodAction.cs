@@ -7,6 +7,7 @@ using JetBrains.ReSharper.Feature.Services.CSharp.Bulbs;
 using JetBrains.ReSharper.Intentions.Extensibility;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp.Tree;
+using JetBrains.ReSharper.UnitTestFramework;
 using JetBrains.TextControl;
 using JetBrains.Util;
 
@@ -17,6 +18,7 @@ namespace CreateTestPlugin
   {
     private readonly ICSharpContextActionDataProvider myProvider;
     private IMethodDeclaration myMethodDeclaration;
+    private IClass myClassDeclaration;
 
     public RunMethodAction(ICSharpContextActionDataProvider provider)
     {
@@ -25,6 +27,14 @@ namespace CreateTestPlugin
 
     protected override Action<ITextControl> ExecutePsiTransaction(ISolution solution, IProgressIndicator progress)
     {
+      var unitTestSessionManager = solution.GetComponent<IUnitTestSessionManager>();
+
+      var element = MethodRunnerElement.Instance;
+
+      var sessionView = unitTestSessionManager.CreateSession();
+
+      sessionView.RunAll(solution.GetComponent<ProcessHostProvider>());
+
       return null;
     }
 
@@ -47,13 +57,13 @@ namespace CreateTestPlugin
       if (!method.IsStatic)
       {
         // only on non-generic types
-        var klass = method.GetContainingType() as IClass;
-        if (klass == null || klass.HasTypeParameters())
+        myClassDeclaration = method.GetContainingType() as IClass;
+        if (myClassDeclaration == null || myClassDeclaration.HasTypeParameters())
           return false;
 
         // with default constructor
-        if (!klass.IsStatic ||
-          (!klass.Constructors.IsEmpty() && !klass.Constructors.Any(c => c.Parameters.IsEmpty())))
+        if (!myClassDeclaration.IsStatic ||
+          (!myClassDeclaration.Constructors.IsEmpty() && !myClassDeclaration.Constructors.Any(c => c.Parameters.IsEmpty())))
           return false;
       }
 
