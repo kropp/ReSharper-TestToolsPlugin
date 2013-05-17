@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using JetBrains.ActionManagement;
 using JetBrains.Application.DataContext;
 using JetBrains.ProjectModel;
