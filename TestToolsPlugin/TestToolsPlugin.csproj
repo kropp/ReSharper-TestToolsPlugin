@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CreateTestsAction.cs" />
+    <Compile Include="RunMethodAction.cs" />
     <Compile Include="TagTestAction.cs" />
     <Compile Include="ToggleIgnoreTestAction.cs" />
     <Compile Include="UnitTestElementEx.cs" />
