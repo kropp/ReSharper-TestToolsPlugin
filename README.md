@@ -1,6 +1,12 @@
 # ReSharper TestTools
 
-This plugin adds action to generate test fixture stub from given class. Only ReSharper 8.0 is supported.
+This plugin adds following actions:
+
+* Generate test fixture stub for given class
+* Ignore/unignore test from Unit Test Session
+* Mark test with category from Unit Test Session (with suggests based on categories used in solution)
+
+Only NUnit and ReSharper 8.0 are supported.
 
 ## Install ##
 
@@ -10,7 +16,7 @@ Open ReSharper - Extension Manager&hellip; and find TestTools in ReSharper Galle
 
 To build the source, you need the [ReSharper 8.0 SDK](http://confluence.jetbrains.com/display/ReSharper/ReSharper+8+EAP) installed.
 
-Simply build solution using VS 2012.
+Simply build solution using VS 2012. (Projects targets .NET 4.0, so it should work in VS 2010 as well)
 
 ## Contributing ##
 
