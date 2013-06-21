@@ -15,6 +15,6 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="TestToolsPlugin\bin\**\*.*" target="ReSharper\v8.0\" />
+    <file src="TestToolsPlugin\bin\Release\*.*" target="ReSharper\v8.0\plugins" />
   </files>
 </package>
