@@ -22,6 +22,26 @@ namespace MethodRunner
       myIsMethodStatic = isMethodStatic;
     }
 
+    public string ClassName
+    {
+      get { return myClassName; }
+    }
+
+    public string MethodName
+    {
+      get { return myMethodName; }
+    }
+
+    public bool IsClassStatic
+    {
+      get { return myIsClassStatic; }
+    }
+
+    public bool IsMethodStatic
+    {
+      get { return myIsMethodStatic; }
+    }
+
     public override bool IsMeaningfulTask
     {
       get { return false; }

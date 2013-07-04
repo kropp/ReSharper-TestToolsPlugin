@@ -16,6 +16,7 @@ namespace CreateTestPlugin
   [ContextAction(Name = "RunMethod", Description = "Run method as a single test", Group = "C#")]
   public class RunMethodAction : ContextActionBase
   {
+    private const string SessionID = "TestToolsPlugin::RunMethodSession";
     private readonly ICSharpContextActionDataProvider myProvider;
     private IMethodDeclaration myMethodDeclaration;
     private IClass myClassDeclaration;
@@ -29,9 +30,12 @@ namespace CreateTestPlugin
     {
       var unitTestSessionManager = solution.GetComponent<IUnitTestSessionManager>();
 
-      var element = MethodRunnerElement.Instance;
+      var element = solution.GetComponent<MethodRunnerProvider>().CreateElement(myClassDeclaration.GetSingleOrDefaultSourceFile().GetProject(), myClassDeclaration.GetClrName(), myMethodDeclaration.DeclaredName, myClassDeclaration.IsStatic, myMethodDeclaration.IsStatic);
 
-      var sessionView = unitTestSessionManager.CreateSession();
+      var sessionView = unitTestSessionManager.GetSession(SessionID) ?? unitTestSessionManager.CreateSession(id: SessionID);
+      sessionView.Title.Value = "Run Method " + myMethodDeclaration.DeclaredName;
+      sessionView.Session.RemoveElements(sessionView.Session.Elements);
+      sessionView.Session.AddElement(element);
 
       sessionView.RunAll(solution.GetComponent<ProcessHostProvider>());
 

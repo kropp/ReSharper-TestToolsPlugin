@@ -10,67 +10,62 @@ namespace CreateTestPlugin
 {
   public class MethodRunnerElement : IUnitTestElement
   {
-    private readonly MethodRunnerElement myInstance = new MethodRunnerElement();
+    private readonly ProjectModelElementEnvoy myProjectEnvoy;
+    private readonly IClrTypeName myClassName;
+    private readonly string myMethodName;
+    private readonly bool myIsClassStatic;
+    private readonly bool myIsMethodStatic;
 
-    private MethodRunnerElement()
+    private readonly MethodRunnerProvider myProvider;
+
+    internal MethodRunnerElement(IProject project, IClrTypeName className, string methodName, bool isClassStatic, bool isMethodStatic, MethodRunnerProvider provider)
     {
+      myProjectEnvoy = ProjectModelElementEnvoy.Create(project);
+      myClassName = className;
+      myMethodName = methodName;
+      myIsClassStatic = isClassStatic;
+      myIsMethodStatic = isMethodStatic;
+      myProvider = provider;
     }
-
-    public MethodRunnerElement GetInstance(MethodRunnerProvider provider, string className, string methodName, bool isClassStatic, bool isMethodStatic)
-    {
-      myInstance.myClassName = className;
-      myInstance.myMethodName = methodName;
-      myInstance.myIsClassStatic = isClassStatic;
-      myInstance.myIsMethodStatic = isMethodStatic;
-      myInstance.myProvider = provider;
-
-      return myInstance;
-    }
-
-    private string myClassName;
-    private string myMethodName;
-    private bool myIsClassStatic;
-    private bool myIsMethodStatic;
-    private IUnitTestProvider myProvider;
 
     public IProject GetProject()
     {
-      throw new System.NotImplementedException();
+      return myProjectEnvoy.GetValidProjectElement() as IProject;
     }
 
     public string GetPresentation(IUnitTestElement parent = null)
     {
-      throw new System.NotImplementedException();
+      return myMethodName + "()";
     }
 
     public UnitTestNamespace GetNamespace()
     {
-      throw new System.NotImplementedException();
+      return new UnitTestNamespace(myClassName.GetNamespaceName());
     }
 
     public UnitTestElementDisposition GetDisposition()
     {
-      throw new System.NotImplementedException();
+      return UnitTestElementDisposition.InvalidDisposition;
     }
 
     public IDeclaredElement GetDeclaredElement()
     {
-      throw new System.NotImplementedException();
+      return null;
     }
 
     public IEnumerable<IProjectFile> GetProjectFiles()
     {
-      throw new System.NotImplementedException();
+      return null;
     }
 
     public IUnitTestRunStrategy GetRunStrategy(IHostProvider hostProvider)
     {
-      throw new System.NotImplementedException();
+      return myProvider.Strategy;
     }
 
     public IList<UnitTestTask> GetTaskSequence(ICollection<IUnitTestElement> explicitElements, IUnitTestLaunch launch)
     {
-      return new List<UnitTestTask> { new UnitTestTask(this, new RunMethodTask()) };
+      return new List<UnitTestTask> { new UnitTestTask(this, new RunMethodTask(MethodRunnerProvider.Id, myClassName.FullName, myMethodName, myIsClassStatic, myIsMethodStatic)) };
     }
 
     public string Kind { get { return "Method"; } }
@@ -92,6 +87,11 @@ namespace CreateTestPlugin
     {
       get { return UnitTestElementState.Fake; }
       set { }
+    }
+
+    public bool Equals(IUnitTestElement other)
+    {
+      return ReferenceEquals(this, other);
     }
   }
 }
