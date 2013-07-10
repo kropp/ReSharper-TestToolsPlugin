@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 using System;
 using System.Linq;
 using JetBrains.Application.Progress;
@@ -25,7 +26,7 @@ using JetBrains.ReSharper.UnitTestFramework;
 using JetBrains.TextControl;
 using JetBrains.Util;
 
-namespace JetBrains.ReSharper.Plugins.TestTools
+namespace JetBrains.ReSharper.Plugins.TestTools.MethodRunner
 {
   [ContextAction(Name = "RunMethod", Description = "Run method as a single test", Group = "C#")]
   public class RunMethodAction : ContextActionBase

@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 using System.Linq;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
@@ -21,7 +22,7 @@ using JetBrains.ReSharper.TaskRunnerFramework;
 using JetBrains.ReSharper.UnitTestFramework;
 using JetBrains.Util;
 
-namespace JetBrains.ReSharper.Plugins.TestTools
+namespace JetBrains.ReSharper.Plugins.TestTools.Util
 {
   public static class UnitTestElementEx
   {

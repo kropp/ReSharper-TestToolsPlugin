@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 using System;
 using System.Text;
 using JetBrains.Application;
@@ -29,7 +30,7 @@ using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.TextControl;
 using JetBrains.Util;
 
-namespace JetBrains.ReSharper.Plugins.TestTools
+namespace JetBrains.ReSharper.Plugins.TestTools.Actions
 {
   [ContextAction(Name = "CreateTests", Description = "Creates tests for given class", Group = "C#")]
   public class CreateTestsAction : ContextActionBase

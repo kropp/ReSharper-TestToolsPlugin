@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -21,6 +22,7 @@ using JetBrains.DataFlow;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Features.Common.UI;
 using JetBrains.ReSharper.Features.Shared.UnitTesting;
+using JetBrains.ReSharper.Plugins.TestTools.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.UnitTestExplorer;
 using JetBrains.ReSharper.UnitTestFramework.Resources;
@@ -35,7 +37,7 @@ using JetBrains.UI.Tooltips;
 using JetBrains.Util;
 using DataConstants = JetBrains.ProjectModel.DataContext.DataConstants;
 
-namespace JetBrains.ReSharper.Plugins.TestTools
+namespace JetBrains.ReSharper.Plugins.TestTools.Actions
 {
   [ActionHandler("TestToolsPlugin.TagTest")]
   public class TagTestAction : IActionHandler
