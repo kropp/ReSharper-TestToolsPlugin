@@ -2,13 +2,13 @@
 <package >
   <metadata>
     <id>ReSharper-TestTools</id>
-    <version>0.1.0-alpha</version>
-    <authors>Victor Kropp, JetBrains</authors>
+    <version>0.3.0-alpha</version>
+    <authors>Victor Kropp, JetBrains s.r.o.</authors>
     <owners>Victor Kropp</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Provides action to create tests for given class</description>
-    <releaseNotes>Initial release with a single action. More to come.</releaseNotes>
-    <copyright>Copyright &#x00A9; 2013 Victor Kropp, JetBrains</copyright>
+    <description>Provides several actions to manipulate tests</description>
+    <releaseNotes>Added context action to run any method w/o parameters as test</releaseNotes>
+    <copyright>Copyright &#x00A9; 2013 Victor Kropp, JetBrains s.r.o.</copyright>
     <tags>Unit Tests</tags>
     <dependencies>
       <dependency id="ReSharper" version="8.0" />
