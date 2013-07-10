@@ -5,6 +5,10 @@ namespace MethodRunner
 {
   public class RunMethodTask : RemoteTask
   {
+    private const string CLASS_NAME = "className";
+    private const string METHOD_NAME = "methodName";
+    private const string IS_CLASS_STATIC = "isClassStatic";
+    private const string IS_METHOD_STATIC = "isMethodStatic";
     private readonly string myClassName;
     private readonly string myMethodName;
     private readonly bool myIsClassStatic;
@@ -12,6 +16,10 @@ namespace MethodRunner
 
     public RunMethodTask(XmlElement element) : base(element)
     {
+      myClassName = GetXmlAttribute(element, CLASS_NAME);
+      myMethodName = GetXmlAttribute(element, METHOD_NAME);
+      myIsClassStatic = bool.Parse(GetXmlAttribute(element, IS_CLASS_STATIC));
+      myIsMethodStatic = bool.Parse(GetXmlAttribute(element, IS_METHOD_STATIC));
     }
 
     public RunMethodTask(string runnerId, string className, string methodName, bool isClassStatic, bool isMethodStatic) : base(runnerId)
@@ -45,6 +53,15 @@ namespace MethodRunner
     public override bool IsMeaningfulTask
     {
       get { return false; }
+    }
+
+    public override void SaveXml(XmlElement element)
+    {
+      base.SaveXml(element);
+      SetXmlAttribute(element, CLASS_NAME, myClassName);
+      SetXmlAttribute(element, METHOD_NAME, myMethodName);
+      SetXmlAttribute(element, IS_CLASS_STATIC, myIsClassStatic.ToString());
+      SetXmlAttribute(element, IS_METHOD_STATIC, myIsMethodStatic.ToString());
     }
 
     protected bool Equals(RunMethodTask other)

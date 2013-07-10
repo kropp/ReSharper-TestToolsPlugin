@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using JetBrains.Application.Progress;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.Bulbs;
@@ -19,7 +18,7 @@ namespace CreateTestPlugin
     private const string SessionID = "TestToolsPlugin::RunMethodSession";
     private readonly ICSharpContextActionDataProvider myProvider;
     private IMethodDeclaration myMethodDeclaration;
-    private IClass myClassDeclaration;
+    private IClassDeclaration myClassDeclaration;
 
     public RunMethodAction(ICSharpContextActionDataProvider provider)
     {
@@ -30,14 +29,14 @@ namespace CreateTestPlugin
     {
       var unitTestSessionManager = solution.GetComponent<IUnitTestSessionManager>();
 
-      var element = solution.GetComponent<MethodRunnerProvider>().CreateElement(myClassDeclaration.GetSingleOrDefaultSourceFile().GetProject(), myClassDeclaration.GetClrName(), myMethodDeclaration.DeclaredName, myClassDeclaration.IsStatic, myMethodDeclaration.IsStatic);
+      var element = solution.GetComponent<MethodRunnerProvider>().CreateElement(myClassDeclaration.GetSourceFile().GetProject(), new ClrTypeName(myClassDeclaration.CLRName), myMethodDeclaration.DeclaredName, myClassDeclaration.IsStatic, myMethodDeclaration.IsStatic);
 
       var sessionView = unitTestSessionManager.GetSession(SessionID) ?? unitTestSessionManager.CreateSession(id: SessionID);
       sessionView.Title.Value = "Run Method " + myMethodDeclaration.DeclaredName;
       sessionView.Session.RemoveElements(sessionView.Session.Elements);
       sessionView.Session.AddElement(element);
 
-      sessionView.RunAll(solution.GetComponent<ProcessHostProvider>());
+      sessionView.Run(new UnitTestElements(new[] {element}), solution.GetComponent<ProcessHostProvider>());
 
       return null;
     }
@@ -61,13 +60,13 @@ namespace CreateTestPlugin
       if (!method.IsStatic)
       {
         // only on non-generic types
-        myClassDeclaration = method.GetContainingType() as IClass;
-        if (myClassDeclaration == null || myClassDeclaration.HasTypeParameters())
+        myClassDeclaration = myMethodDeclaration.GetContainingTypeDeclaration() as IClassDeclaration;
+        if (myClassDeclaration == null || myClassDeclaration.TypeParameters.Any())
           return false;
 
         // with default constructor
-        if (!myClassDeclaration.IsStatic ||
-          (!myClassDeclaration.Constructors.IsEmpty() && !myClassDeclaration.Constructors.Any(c => c.Parameters.IsEmpty())))
+        if (!myClassDeclaration.IsStatic &&
+          (!myClassDeclaration.ConstructorDeclarations.IsEmpty() && !myClassDeclaration.ConstructorDeclarations.Any(c => c.ParameterDeclarations.IsEmpty())))
           return false;
       }
 
