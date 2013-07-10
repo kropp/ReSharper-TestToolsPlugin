@@ -5,6 +5,7 @@ This plugin adds following actions:
 * Generate test fixture stub for given class
 * Ignore/unignore test from Unit Test Session
 * Mark test with category from Unit Test Session (with suggests based on categories used in solution)
+* Run any method w/o parameters as test
 
 Only NUnit and ReSharper 8.0 are supported.
 
