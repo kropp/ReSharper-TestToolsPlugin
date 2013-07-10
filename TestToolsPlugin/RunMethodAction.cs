@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using JetBrains.Application.Progress;
+using JetBrains.DataFlow;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.Bulbs;
 using JetBrains.ReSharper.Feature.Services.CSharp.Bulbs;
@@ -10,7 +12,7 @@ using JetBrains.ReSharper.UnitTestFramework;
 using JetBrains.TextControl;
 using JetBrains.Util;
 
-namespace CreateTestPlugin
+namespace JetBrains.ReSharper.Plugins.TestTools
 {
   [ContextAction(Name = "RunMethod", Description = "Run method as a single test", Group = "C#")]
   public class RunMethodAction : ContextActionBase
@@ -37,6 +39,26 @@ namespace CreateTestPlugin
       sessionView.Session.AddElement(element);
 
       sessionView.Run(new UnitTestElements(new[] {element}), solution.GetComponent<ProcessHostProvider>());
+
+      var launchLifetime = Lifetimes.Define(solution.GetLifetime(), "MethodRunner");
+      var unitTestResultManager = solution.GetComponent<IUnitTestResultManager>();
+
+      EventHandler<UnitTestResultEventArgs> onUnitTestResultUpdated = (sender, args) =>
+      {
+        if (args.Element == element && args.Result.RunStatus == UnitTestRunStatus.Completed)
+        {
+          var exceptions = string.Empty;
+          if (args.Result.Exceptions.Any())
+            exceptions = args.Result.Exceptions.First().StackTrace;
+          MessageBox.ShowInfo(args.Result.Message + " " + args.Result.Output + " " + exceptions);
+          launchLifetime.Terminate();
+        }
+      };
+
+      launchLifetime.Lifetime.AddBracket(
+        () => unitTestResultManager.UnitTestResultUpdated += onUnitTestResultUpdated,
+        () => unitTestResultManager.UnitTestResultUpdated -= onUnitTestResultUpdated
+      );
 
       return null;
     }

@@ -1,12 +1,12 @@
 ﻿using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.TaskRunnerFramework;
+using JetBrains.ReSharper.TestToolsPlugin.MethodRunner;
 using JetBrains.ReSharper.UnitTestExplorer.Manager;
 using JetBrains.ReSharper.UnitTestFramework;
 using JetBrains.ReSharper.UnitTestFramework.Strategy;
-using MethodRunner;
 
-namespace CreateTestPlugin
+namespace JetBrains.ReSharper.TestToolsPlugin
 {
   [UnitTestProvider]
   public class MethodRunnerProvider : IUnitTestProvider
