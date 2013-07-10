@@ -8,8 +8,8 @@
     <ProjectGuid>{A38DB6A1-896E-487D-9C83-D1BFB655CFAB}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>JetBrains.ReSharper.TestToolsPlugin.MethodRunner</RootNamespace>
-    <AssemblyName>JetBrains.ReSharper.TestToolsPlugin.MethodRunner</AssemblyName>
+    <RootNamespace>JetBrains.ReSharper.Plugins.TestTools.MethodRunner</RootNamespace>
+    <AssemblyName>JetBrains.ReSharper.Plugins.TestTools.MethodRunner</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

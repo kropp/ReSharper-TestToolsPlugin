@@ -5,12 +5,12 @@ using JetBrains.Application.PluginSupport;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CreateTestPlugin")]
-[assembly: AssemblyDescription("Creates NUnit test stub for tests on given class")]
+[assembly: AssemblyTitle("TestTools plugin for ReSharper")]
+[assembly: AssemblyDescription("Provides number of useful test-related functions")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Victor Kropp, JetBrains")]
-[assembly: AssemblyProduct("CreateTestPlugin")]
-[assembly: AssemblyCopyright("Copyright © Victor Kropp, JetBrains, 2013")]
+[assembly: AssemblyCompany("Victor Kropp, JetBrains s.r.o.")]
+[assembly: AssemblyProduct("ReSharper-TestToolsPlugin")]
+[assembly: AssemblyCopyright("Copyright © Victor Kropp, JetBrains s.r.o., 2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

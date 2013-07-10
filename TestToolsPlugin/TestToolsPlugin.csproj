@@ -8,8 +8,8 @@
     <ProjectGuid>{E9EADE7D-287C-4BE9-9941-27076654E14B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>JetBrains.ReSharper.TestToolsPlugin</RootNamespace>
-    <AssemblyName>JetBrains.ReSharper.TestToolsPlugin</AssemblyName>
+    <RootNamespace>JetBrains.ReSharper.Plugins.TestTools</RootNamespace>
+    <AssemblyName>JetBrains.ReSharper.Plugins.TestTools</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

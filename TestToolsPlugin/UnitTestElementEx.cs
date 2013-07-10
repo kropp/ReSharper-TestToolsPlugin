@@ -8,7 +8,7 @@ using JetBrains.ReSharper.TaskRunnerFramework;
 using JetBrains.ReSharper.UnitTestFramework;
 using JetBrains.Util;
 
-namespace CreateTestPlugin
+namespace JetBrains.ReSharper.Plugins.TestTools
 {
   public static class UnitTestElementEx
   {

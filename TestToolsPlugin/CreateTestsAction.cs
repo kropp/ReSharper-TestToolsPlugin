@@ -16,7 +16,7 @@ using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.TextControl;
 using JetBrains.Util;
 
-namespace CreateTestPlugin
+namespace JetBrains.ReSharper.Plugins.TestTools
 {
   [ContextAction(Name = "CreateTests", Description = "Creates tests for given class", Group = "C#")]
   public class CreateTestsAction : ContextActionBase

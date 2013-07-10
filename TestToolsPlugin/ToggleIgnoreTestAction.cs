@@ -8,7 +8,7 @@ using JetBrains.ReSharper.UnitTestFramework;
 using JetBrains.Util;
 using DataConstants = JetBrains.ProjectModel.DataContext.DataConstants;
 
-namespace CreateTestPlugin
+namespace JetBrains.ReSharper.Plugins.TestTools
 {
   [ActionHandler("TestToolsPlugin.ToggleIgnoreTest")]
   public class ToggleIgnoreTestAction : IActionHandler

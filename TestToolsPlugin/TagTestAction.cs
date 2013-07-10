@@ -22,7 +22,7 @@ using JetBrains.UI.Tooltips;
 using JetBrains.Util;
 using DataConstants = JetBrains.ProjectModel.DataContext.DataConstants;
 
-namespace CreateTestPlugin
+namespace JetBrains.ReSharper.Plugins.TestTools
 {
   [ActionHandler("TestToolsPlugin.TagTest")]
   public class TagTestAction : IActionHandler

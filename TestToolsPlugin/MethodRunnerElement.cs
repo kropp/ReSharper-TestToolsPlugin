@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Plugins.TestTools.MethodRunner;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.UnitTestFramework;
 using JetBrains.ReSharper.UnitTestFramework.Strategy;
 using JetBrains.Util;
-using MethodRunner;
 
-namespace CreateTestPlugin
+namespace JetBrains.ReSharper.Plugins.TestTools
 {
   public class MethodRunnerElement : IUnitTestElement
   {
@@ -65,7 +65,7 @@ namespace CreateTestPlugin
 
     public IList<UnitTestTask> GetTaskSequence(ICollection<IUnitTestElement> explicitElements, IUnitTestLaunch launch)
     {
-      return new List<UnitTestTask> { new UnitTestTask(this, new RunMethodTask(MethodRunnerProvider.Id, myClassName.FullName, myMethodName, myIsClassStatic, myIsMethodStatic)) };
+      return new List<UnitTestTask> { new UnitTestTask(this, new RunMethodTask(MethodRunnerProvider.Id, ((IProject)myProjectEnvoy.GetValidProjectElement()).GetOutputFilePath().FullPath, myClassName.FullName, myMethodName, myIsClassStatic, myIsMethodStatic)) };
     }
 
     public string Kind { get { return "Method"; } }
