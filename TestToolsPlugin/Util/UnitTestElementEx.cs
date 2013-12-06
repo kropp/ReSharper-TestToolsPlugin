@@ -61,7 +61,7 @@ namespace JetBrains.ReSharper.Plugins.TestTools.Util
         if (result.Status == UnitTestStatus.Failed || result.Status == UnitTestStatus.Aborted)
         {
           element.Ignore();
-          resultManager.TestFinishing(element, string.Empty, TaskResult.Skipped);
+          resultManager.TestFinishing(element, null, string.Empty, TaskResult.Skipped);
         }
       }
     }
