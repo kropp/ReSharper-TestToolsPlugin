@@ -22,7 +22,7 @@ using JetBrains.ReSharper.TaskRunnerFramework;
 using JetBrains.ReSharper.UnitTestFramework;
 using JetBrains.Util;
 
-namespace JetBrains.ReSharper.Plugins.TestTools.Util
+namespace ReSharper.Plugins.TestTools.Util
 {
   public static class UnitTestElementEx
   {

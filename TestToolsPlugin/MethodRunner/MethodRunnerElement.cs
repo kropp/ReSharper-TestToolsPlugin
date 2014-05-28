@@ -19,7 +19,7 @@ using JetBrains.ReSharper.UnitTestFramework;
 using JetBrains.ReSharper.UnitTestFramework.Strategy;
 using JetBrains.Util;
 
-namespace JetBrains.ReSharper.Plugins.TestTools.MethodRunner
+namespace ReSharper.Plugins.TestTools.MethodRunner
 {
   public class MethodRunnerElement : IUnitTestElement
   {
@@ -98,7 +98,7 @@ namespace JetBrains.ReSharper.Plugins.TestTools.MethodRunner
 
     public UnitTestElementState State
     {
-      get { return UnitTestElementState.Fake; }
+      get { return UnitTestElementState.Valid; }
       set { }
     }
 

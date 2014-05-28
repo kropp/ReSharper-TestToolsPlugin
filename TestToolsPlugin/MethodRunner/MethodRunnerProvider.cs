@@ -19,7 +19,7 @@ using JetBrains.ReSharper.UnitTestExplorer.Manager;
 using JetBrains.ReSharper.UnitTestFramework;
 using JetBrains.ReSharper.UnitTestFramework.Strategy;
 
-namespace JetBrains.ReSharper.Plugins.TestTools.MethodRunner
+namespace ReSharper.Plugins.TestTools.MethodRunner
 {
   [UnitTestProvider]
   public class MethodRunnerProvider : IUnitTestProvider

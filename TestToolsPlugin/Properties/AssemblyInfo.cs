@@ -12,23 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using System.Reflection;
+using System.Runtime.InteropServices;
 using JetBrains.ActionManagement;
 using JetBrains.Application.PluginSupport;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("TestTools plugin for ReSharper")]
-[assembly: AssemblyDescription("Provides number of useful test-related functions")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Victor Kropp, JetBrains s.r.o.")]
-[assembly: AssemblyProduct("ReSharper-TestToolsPlugin")]
-[assembly: AssemblyCopyright("Copyright © Victor Kropp, JetBrains s.r.o., 2013")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
+[assembly: AssemblyTitle("Test Tools Plugin for ReSharper")]
 
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("0.1.0.0")]
+[assembly: AssemblyFileVersion("0.1.0.0")]
+[assembly: ComVisible(false)]
 
 [assembly: ActionsXml("CreateTestPlugin.Actions.xml")]
 

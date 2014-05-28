@@ -16,14 +16,10 @@ using System.Reflection;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("TestToolsPlugin.MethodRunner")]
-[assembly: AssemblyDescription("Runs single method as test")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Victor Kropp, JetBrains s.r.o.")]
-[assembly: AssemblyProduct("TestToolsPlugin")]
-[assembly: AssemblyCopyright("Copyright © Victor Kropp, JetBrains s.r.o., 2013")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
+using System.Runtime.InteropServices;
 
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyTitle("Test Tools Plugin for ReSharper")]
+
+[assembly: AssemblyVersion("0.1.0.0")]
+[assembly: AssemblyFileVersion("0.1.0.0")]
+[assembly: ComVisible(false)]

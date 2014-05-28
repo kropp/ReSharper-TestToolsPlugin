@@ -14,19 +14,22 @@
 
 using System;
 using System.Linq;
+using System.Reflection;
 using JetBrains.Application.Progress;
 using JetBrains.DataFlow;
 using JetBrains.ProjectModel;
+using JetBrains.ProjectModel.Resources;
 using JetBrains.ReSharper.Feature.Services.Bulbs;
 using JetBrains.ReSharper.Feature.Services.CSharp.Bulbs;
 using JetBrains.ReSharper.Intentions.Extensibility;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp.Tree;
 using JetBrains.ReSharper.UnitTestFramework;
+using JetBrains.ReSharper.UnitTestFramework.Elements;
 using JetBrains.TextControl;
 using JetBrains.Util;
 
-namespace JetBrains.ReSharper.Plugins.TestTools.MethodRunner
+namespace ReSharper.Plugins.TestTools.MethodRunner
 {
   [ContextAction(Name = "RunMethod", Description = "Run method as a single test", Group = "C#")]
   public class RunMethodAction : ContextActionBase
@@ -47,14 +50,20 @@ namespace JetBrains.ReSharper.Plugins.TestTools.MethodRunner
 
       var element = solution.GetComponent<MethodRunnerProvider>().CreateElement(myClassDeclaration.GetSourceFile().GetProject(), new ClrTypeName(myClassDeclaration.CLRName), myMethodDeclaration.DeclaredName, myClassDeclaration.IsStatic, myMethodDeclaration.IsStatic);
 
+      var unitTestElementManager = solution.GetComponent<IUnitTestElementManager>();
+      unitTestElementManager.AddElement(element);
+
       var sessionView = unitTestSessionManager.GetSession(SessionID) ?? unitTestSessionManager.CreateSession(id: SessionID);
       sessionView.Title.Value = "Run Method " + myMethodDeclaration.DeclaredName;
-      sessionView.Session.RemoveElements(sessionView.Session.Elements);
       sessionView.Session.AddElement(element);
 
-      sessionView.Run(new UnitTestElements(new[] {element}), solution.GetComponent<ProcessHostProvider>());
-
       var launchLifetime = Lifetimes.Define(solution.GetLifetime(), "MethodRunner");
+      launchLifetime.Lifetime.AddAction(() =>
+      {
+        unitTestElementManager.RemoveElements(new[] {element});
+        unitTestSessionManager.CloseSession(sessionView);
+      });
+
       var unitTestResultManager = solution.GetComponent<IUnitTestResultManager>();
 
       EventHandler<UnitTestResultEventArgs> onUnitTestResultUpdated = (sender, args) =>
@@ -62,17 +71,22 @@ namespace JetBrains.ReSharper.Plugins.TestTools.MethodRunner
         if (args.Element == element && args.Result.RunStatus == UnitTestRunStatus.Completed)
         {
           var exceptions = string.Empty;
-          if (args.Result.Exceptions.Any())
-            exceptions = args.Result.Exceptions.First().StackTrace;
-          MessageBox.ShowInfo(args.Result.Message + " " + args.Result.Output + " " + exceptions);
+          var resultData = unitTestResultManager.GetResultData(args.Element);
+          if (resultData.Exceptions.Any())
+            exceptions = resultData.Exceptions.First().StackTrace;
+          MessageBox.ShowInfo(args.Result.Message + " " + resultData.Output + " " + exceptions);
+          
+          // cleanup
           launchLifetime.Terminate();
         }
       };
 
-      launchLifetime.Lifetime.AddBracket(
-        () => unitTestResultManager.UnitTestResultUpdated += onUnitTestResultUpdated,
-        () => unitTestResultManager.UnitTestResultUpdated -= onUnitTestResultUpdated
-      );
+      unitTestResultManager.UnitTestResultUpdated += onUnitTestResultUpdated;
+      launchLifetime.Lifetime.AddAction(() => unitTestResultManager.UnitTestResultUpdated -= onUnitTestResultUpdated);
+
+      sessionView.Run(new UnitTestElements(new[] {element}), solution.GetComponent<ProcessHostProvider>());
+
+      Assembly.LoadFile(typeof(RunMethodTask).Assembly.Location);
 
       return null;
     }

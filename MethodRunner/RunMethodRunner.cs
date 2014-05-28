@@ -13,10 +13,12 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using JetBrains.ReSharper.TaskRunnerFramework;
 
-namespace JetBrains.ReSharper.Plugins.TestTools.MethodRunner
+namespace ReSharper.Plugins.TestTools.MethodRunner
 {
   public class RunMethodRunner : RecursiveRemoteTaskRunner
   {
@@ -68,7 +70,10 @@ namespace JetBrains.ReSharper.Plugins.TestTools.MethodRunner
       finally
       {
         if (!string.IsNullOrEmpty(output))
+        {
           Server.TaskOutput(runMethodTask, output, TaskOutputType.STDOUT);
+          Trace.WriteLine(output.FirstOrDefault().ToString());
+        }
         Server.TaskFinished(runMethodTask, message, result);
       }
     }

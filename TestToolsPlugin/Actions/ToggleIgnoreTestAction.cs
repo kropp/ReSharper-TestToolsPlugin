@@ -16,14 +16,14 @@ using System.Linq;
 using JetBrains.ActionManagement;
 using JetBrains.Application.DataContext;
 using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Plugins.TestTools.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.UnitTestExplorer;
 using JetBrains.ReSharper.UnitTestFramework;
 using JetBrains.Util;
+using ReSharper.Plugins.TestTools.Util;
 using DataConstants = JetBrains.ProjectModel.DataContext.DataConstants;
 
-namespace JetBrains.ReSharper.Plugins.TestTools.Actions
+namespace ReSharper.Plugins.TestTools.Actions
 {
   [ActionHandler("TestToolsPlugin.ToggleIgnoreTest")]
   public class ToggleIgnoreTestAction : IActionHandler

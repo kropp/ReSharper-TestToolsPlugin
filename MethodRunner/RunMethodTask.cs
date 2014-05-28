@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Xml;
 using JetBrains.ReSharper.TaskRunnerFramework;
 
-namespace JetBrains.ReSharper.Plugins.TestTools.MethodRunner
+namespace ReSharper.Plugins.TestTools.MethodRunner
 {
-  public class RunMethodTask : RemoteTask
+  [Serializable]
+  public class RunMethodTask : RemoteTask, IEquatable<RunMethodTask>
   {
     private const string ASSEMBLY_LOCATION = "assemblyLocation";
     private const string CLASS_NAME = "className";
@@ -89,7 +91,7 @@ namespace JetBrains.ReSharper.Plugins.TestTools.MethodRunner
       SetXmlAttribute(element, IS_METHOD_STATIC, myIsMethodStatic.ToString());
     }
 
-    protected bool Equals(RunMethodTask other)
+    public bool Equals(RunMethodTask other)
     {
       return string.Equals(myClassName, other.myClassName) && string.Equals(myMethodName, other.myMethodName) &&
         myIsClassStatic.Equals(other.myIsClassStatic) && myIsMethodStatic.Equals(other.myIsMethodStatic);
